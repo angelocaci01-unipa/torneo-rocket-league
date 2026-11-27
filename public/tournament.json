@@ -1,0 +1,9 @@
+{
+  "name": "Torneo Rocket League",
+  "subtitle": "Intesa Universitaria",
+  "teams": [],
+  "groups": [],
+  "matches": [],
+  "settings": { "groupBestOf": 3, "qfBestOf": 5, "sfBestOf": 5, "finalBestOf": 7, "advancePerGroup": 2 },
+  "updatedAt": "2026-11-27T00:00:00.000Z"
+}
