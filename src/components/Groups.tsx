@@ -1,6 +1,7 @@
 import { teamById, useT } from '../context'
 import { groupMatches, isGroupComplete, standings } from '../logic'
 import { MatchCard } from './MatchCard'
+import { TeamBadge } from './TeamBadge'
 
 export function Groups() {
   const { t, admin } = useT()
@@ -33,11 +34,11 @@ export function Groups() {
                   <tr>
                     <th>#</th>
                     <th className="left">Squadra</th>
-                    <th title="Serie giocate">G</th>
+                    <th title="Serie giocate" className="hide-sm">G</th>
                     <th title="Serie vinte">V</th>
                     <th title="Serie perse">P</th>
                     <th title="Differenza partite (game)">±Game</th>
-                    <th title="Differenza reti">±Gol</th>
+                    <th title="Differenza reti" className="hide-sm">±Gol</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -48,12 +49,17 @@ export function Groups() {
                     return (
                       <tr key={r.teamId} className={q ? 'qualified' : ''}>
                         <td>{i + 1}</td>
-                        <td className="left strong">{teamById(t, r.teamId)?.name}</td>
-                        <td>{r.played}</td>
+                        <td className="left strong">
+                          <span className="team-cell">
+                            <TeamBadge team={teamById(t, r.teamId)} size={24} />
+                            <span>{teamById(t, r.teamId)?.name}</span>
+                          </span>
+                        </td>
+                        <td className="hide-sm">{r.played}</td>
                         <td className="strong">{r.w}</td>
                         <td>{r.l}</td>
                         <td>{gd > 0 ? `+${gd}` : gd}</td>
-                        <td>{gold > 0 ? `+${gold}` : gold}</td>
+                        <td className="hide-sm">{gold > 0 ? `+${gold}` : gold}</td>
                       </tr>
                     )
                   })}

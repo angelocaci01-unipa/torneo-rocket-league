@@ -21,13 +21,16 @@ export function normalize(raw: Partial<Tournament>): Tournament {
   return t
 }
 
-async function fetchPublished(): Promise<Tournament> {
+const POLL_MS = 60_000
+
+/** Scarica i dati pubblicati; null se la rete o il file non sono disponibili. */
+async function fetchPublished(): Promise<Tournament | null> {
   try {
     const res = await fetch(`${PUBLISHED_URL}?t=${Date.now()}`, { cache: 'no-store' })
     if (!res.ok) throw new Error(String(res.status))
     return normalize(await res.json())
   } catch {
-    return emptyTournament()
+    return null
   }
 }
 
@@ -47,16 +50,38 @@ export function isAdminUrl() {
 export function useTournament(admin: boolean) {
   const [t, setT] = useState<Tournament | null>(null)
   const [published, setPublished] = useState<Tournament | null>(null)
+  const [lastSync, setLastSync] = useState<Date | null>(null)
 
   useEffect(() => {
     let cancelled = false
-    fetchPublished().then((pub) => {
+    fetchPublished().then((fetched) => {
       if (cancelled) return
+      const pub = fetched ?? emptyTournament()
       setPublished(pub)
       setT(admin ? (loadDraft() ?? pub) : pub)
+      if (fetched) setLastSync(new Date())
     })
     return () => {
       cancelled = true
+    }
+  }, [admin])
+
+  // Vista pubblica: ricontrolla periodicamente i dati pubblicati
+  useEffect(() => {
+    if (admin) return
+    const refresh = async () => {
+      const pub = await fetchPublished()
+      if (!pub) return
+      setLastSync(new Date())
+      setPublished(pub)
+      setT((cur) => (cur && cur.updatedAt === pub.updatedAt ? cur : pub))
+    }
+    const id = setInterval(refresh, POLL_MS)
+    const onVisible = () => document.visibilityState === 'visible' && refresh()
+    document.addEventListener('visibilitychange', onVisible)
+    return () => {
+      clearInterval(id)
+      document.removeEventListener('visibilitychange', onVisible)
     }
   }, [admin])
 
@@ -82,7 +107,7 @@ export function useTournament(admin: boolean) {
     if (published) setT(published)
   }, [published])
 
-  return { t, update, replace, discardDraft, published }
+  return { t, update, replace, discardDraft, published, lastSync }
 }
 
 export function downloadJson(t: Tournament) {

@@ -3,6 +3,7 @@ import { useT } from '../context'
 import { uid } from '../logic'
 import type { Team } from '../types'
 import { Empty } from './Groups'
+import { TeamBadge } from './TeamBadge'
 
 export function Teams() {
   const { t, admin } = useT()
@@ -26,6 +27,7 @@ export function Teams() {
                 ) : (
                   <div key={team.id} className="card team-card">
                     <div className="team-card__head">
+                      <TeamBadge team={team} size={44} />
                       <h3>{team.name}</h3>
                       {groupOf(team.id) && <span className="pill">Girone {groupOf(team.id)}</span>}
                     </div>

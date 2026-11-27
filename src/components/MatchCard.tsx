@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { teamById, useT } from '../context'
 import { bestOfFor, matchTeams, seriesResult, type Slot } from '../logic'
 import type { Game, Match } from '../types'
+import { TeamBadge } from './TeamBadge'
 
 interface Props {
   match: Match
@@ -52,6 +53,7 @@ function TeamRow(p: { slot: Slot; side: 'blue' | 'orange'; wins: number; isWinne
   return (
     <div className={`team-row team-row--${p.side} ${p.isWinner ? 'win' : ''} ${p.isLoser ? 'lose' : ''}`}>
       <span className="team-row__bar" />
+      <TeamBadge team={team} size={26} />
       <span className="team-row__name">
         {team ? team.name : <span className="muted">{p.slot.label || 'Da definire'}</span>}
         {p.slot.manual && <span className="tag" title="Assegnata manualmente">M</span>}
